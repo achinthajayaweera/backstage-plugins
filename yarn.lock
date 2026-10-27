@@ -10491,6 +10491,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@openchoreo/genui-core@workspace:packages/genui-core":
+  version: 0.0.0-use.local
+  resolution: "@openchoreo/genui-core@workspace:packages/genui-core"
+  dependencies:
+    "@backstage/cli": "npm:^0.36.2"
+    zod: "npm:3.25.76"
+  languageName: unknown
+  linkType: soft
+
 "@openchoreo/openapi-client-generator-node@workspace:^, @openchoreo/openapi-client-generator-node@workspace:packages/openapi-client-generator-node":
   version: 0.0.0-use.local
   resolution: "@openchoreo/openapi-client-generator-node@workspace:packages/openapi-client-generator-node"
