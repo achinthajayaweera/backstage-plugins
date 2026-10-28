@@ -9749,6 +9749,7 @@ __metadata:
     "@testing-library/user-event": "npm:14.6.1"
     "@types/react-syntax-highlighter": "npm:^15.5.13"
     react-syntax-highlighter: "npm:^15.6.1"
+    recharts: "npm:3.4.1"
   peerDependencies:
     react: ^18.0.0
   languageName: unknown

@@ -24,6 +24,8 @@ export { StatusBadge } from './components/StatusBadge';
 export type { StatusType } from './components/StatusBadge';
 export { Card } from './components/Card';
 export type { CardProps } from './components/Card';
+export { BarChart } from './components/BarChart';
+export type { BarChartProps, BarChartDatum } from './components/BarChart';
 export { RefreshOverlay } from './components/RefreshOverlay';
 export type { RefreshOverlayProps } from './components/RefreshOverlay';
 export { Skeleton } from './components/Skeleton';

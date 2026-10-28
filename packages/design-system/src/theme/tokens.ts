@@ -178,6 +178,19 @@ export type ThemeTokens = {
     labelPillFill: string;
   };
 
+  // ---- Data visualisation ---------------------------------------------------
+  chart: {
+    /**
+     * Categorical series colours, in order of use. Components wrap around when
+     * there are more series than entries. Each colour has at least 3:1 contrast
+     * against `surface.paper` (WCAG 2.2 SC 1.4.11, non-text contrast), measured
+     * as 3.71:1 at the lowest in light mode and 6.18:1 in dark mode. That is
+     * enough for bars, lines and slices but not for text, so never use these
+     * as a text colour.
+     */
+    series: readonly string[];
+  };
+
   // ---- Motion / animation timing --------------------------------------------
   // Single source of truth for loading/animation timing so shimmer, pulse,
   // spin and fade-in read consistently everywhere. Colors for shimmer live in
@@ -440,6 +453,21 @@ export const lightTokens: ThemeTokens = {
     labelPillFill: 'rgba(255, 255, 255, 0.75)',
   },
 
+  chart: {
+    series: [
+      '#3f6cb0',
+      '#2f8f7a',
+      '#b06636',
+      '#845bb0',
+      '#a53f63',
+      '#6f7a2f',
+      '#2f8fae',
+      '#8a6a34',
+      '#6f727a',
+      '#993f8f',
+    ],
+  },
+
   motion: {
     shimmerDuration: '2s',
     shimmerEasing: 'ease-in-out',
@@ -673,6 +701,21 @@ export const darkTokens: ThemeTokens = {
     nodeShadowInner: 'rgba(0, 0, 0, 0.35)',
     nodeShadowOuter: 'rgba(0, 0, 0, 0.55)',
     labelPillFill: 'rgba(30, 30, 30, 0.65)',
+  },
+
+  chart: {
+    series: [
+      '#8fa8e0',
+      '#4fc0a4',
+      '#e0a074',
+      '#bb9fe0',
+      '#e07f9f',
+      '#b6c470',
+      '#5fc0e0',
+      '#a7adb8',
+      '#d8c85f',
+      '#d98fd0',
+    ],
   },
 
   motion: {
