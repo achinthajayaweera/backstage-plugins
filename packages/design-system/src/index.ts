@@ -87,3 +87,5 @@ export { PieChart } from './components/PieChart';
 export type { PieChartProps, PieChartDatum } from './components/PieChart';
 export { MetricCard } from './components/MetricCard';
 export type { MetricCardProps, MetricFormat } from './components/MetricCard';
+export { LineChart } from './components/LineChart';
+export type { LineChartProps, LineChartDatum } from './components/LineChart';
