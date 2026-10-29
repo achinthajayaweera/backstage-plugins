@@ -83,3 +83,5 @@ export {
   useVisuallyHiddenStyles,
 } from './components/VisuallyHidden';
 export type { VisuallyHiddenProps } from './components/VisuallyHidden';
+export { PieChart } from './components/PieChart';
+export type { PieChartProps, PieChartDatum } from './components/PieChart';
