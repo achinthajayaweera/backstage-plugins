@@ -85,3 +85,5 @@ export {
 export type { VisuallyHiddenProps } from './components/VisuallyHidden';
 export { PieChart } from './components/PieChart';
 export type { PieChartProps, PieChartDatum } from './components/PieChart';
+export { MetricCard } from './components/MetricCard';
+export type { MetricCardProps, MetricFormat } from './components/MetricCard';
