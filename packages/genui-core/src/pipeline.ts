@@ -91,7 +91,7 @@ export async function runPipeline(
             ns,
             cursor,
           );
-          rows.push(...page.items);
+          rows.push(...(ep.derive ? page.items.map(ep.derive) : page.items));
           cursor = ep.paginated ? page.nextCursor : undefined;
           if (rows.length >= limits.maxRowsPerSource) {
             truncated = true;

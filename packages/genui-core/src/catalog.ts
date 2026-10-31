@@ -1,3 +1,5 @@
+import type { Row } from './paths';
+
 export type FieldType = 'string' | 'number' | 'boolean' | 'time';
 
 export interface CatalogEndpoint {
@@ -15,6 +17,12 @@ export interface CatalogEndpoint {
   params: Record<string, 'string' | 'number' | 'boolean'>;
   /** Flat dotted paths the LLM may reference, with their types. */
   fields: Record<string, FieldType>;
+  /**
+   * Adds computed fields to each fetched row, under `derived.`, for data that
+   * dotted paths cannot read (for example a conditions array). It runs in code,
+   * never from LLM output, so the LLM can only use fields the catalog lists.
+   */
+  derive?: (row: Row) => Row;
 }
 
 /**
