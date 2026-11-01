@@ -5,3 +5,4 @@ export * from './transform';
 export * from './validate';
 export * from './pipeline';
 export * from './deployments';
+export * from './viewModel';
