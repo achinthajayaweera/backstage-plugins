@@ -10492,12 +10492,27 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@openchoreo/genui-core@workspace:packages/genui-core":
+"@openchoreo/genui-core@workspace:^, @openchoreo/genui-core@workspace:packages/genui-core":
   version: 0.0.0-use.local
   resolution: "@openchoreo/genui-core@workspace:packages/genui-core"
   dependencies:
     "@backstage/cli": "npm:^0.36.2"
     zod: "npm:3.25.76"
+  languageName: unknown
+  linkType: soft
+
+"@openchoreo/genui-react@workspace:packages/genui-react":
+  version: 0.0.0-use.local
+  resolution: "@openchoreo/genui-react@workspace:packages/genui-react"
+  dependencies:
+    "@backstage/cli": "npm:^0.36.2"
+    "@material-ui/core": "npm:4.12.4"
+    "@openchoreo/backstage-design-system": "workspace:^"
+    "@openchoreo/genui-core": "workspace:^"
+    "@testing-library/jest-dom": "npm:6.9.1"
+    "@testing-library/react": "npm:14.3.1"
+  peerDependencies:
+    react: ^18.0.0
   languageName: unknown
   linkType: soft
 

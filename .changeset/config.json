@@ -29,7 +29,8 @@
       "@openchoreo/backstage-plugin-catalog-backend-module-openchoreo-users",
       "@openchoreo/cell-diagram",
       "@openchoreo/backstage-portal-backend",
-      "@openchoreo/genui-core"
+      "@openchoreo/genui-core",
+      "@openchoreo/genui-react"
     ]
   ],
   "access": "public",
