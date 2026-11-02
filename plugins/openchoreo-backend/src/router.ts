@@ -1064,6 +1064,38 @@ export async function createRouter({
     res.json({ success: true, data: { items } });
   });
 
+  router.get('/namespace-release-bindings', async (req, res) => {
+    const { namespaceName, limit, cursor } = req.query;
+
+    if (!namespaceName || typeof namespaceName !== 'string') {
+      throw new InputError('namespaceName is a required query parameter');
+    }
+    let pageSize: number | undefined;
+    if (limit !== undefined) {
+      pageSize = Number(limit);
+      if (!Number.isInteger(pageSize) || pageSize < 1 || pageSize > 100) {
+        throw new InputError('limit must be a whole number from 1 to 100');
+      }
+    }
+    if (cursor !== undefined && typeof cursor !== 'string') {
+      throw new InputError('cursor must be a string');
+    }
+
+    const userToken = getUserTokenFromRequest(req);
+
+    const page = await environmentInfoService.fetchNamespaceReleaseBindings(
+      { namespaceName, limit: pageSize, cursor },
+      userToken,
+    );
+    const items = ((page as any)?.items ?? []).map((binding: any) =>
+      transformReleaseBinding(binding),
+    );
+    res.json({
+      success: true,
+      data: { items, nextCursor: (page as any)?.pagination?.nextCursor },
+    });
+  });
+
   router.get('/resource-release-bindings', async (req, res) => {
     const { resourceName, projectName, namespaceName } = req.query;
 

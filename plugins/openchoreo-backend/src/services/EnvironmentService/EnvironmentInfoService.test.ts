@@ -488,6 +488,42 @@ describe('EnvironmentInfoService', () => {
     });
   });
 
+  describe('fetchNamespaceReleaseBindings', () => {
+    it('lists a namespace without a component filter and passes paging through', async () => {
+      mockGET.mockResolvedValueOnce(
+        createOkResponse({
+          items: [k8sReleaseBinding],
+          pagination: { nextCursor: 'abc' },
+        }),
+      );
+
+      const service = createService();
+      const result = await service.fetchNamespaceReleaseBindings(
+        { namespaceName: 'test-ns', limit: 25, cursor: 'prev' },
+        'token-123',
+      );
+
+      expect((result as any).items).toHaveLength(1);
+      expect(mockGET).toHaveBeenCalledWith(
+        '/api/v1/namespaces/{namespaceName}/releasebindings',
+        {
+          params: {
+            path: { namespaceName: 'test-ns' },
+            query: { limit: 25, cursor: 'prev' },
+          },
+        },
+      );
+    });
+
+    it('rethrows when the API call fails', async () => {
+      mockGET.mockRejectedValueOnce(new Error('boom'));
+      const service = createService();
+      await expect(
+        service.fetchNamespaceReleaseBindings({ namespaceName: 'test-ns' }),
+      ).rejects.toThrow('boom');
+    });
+  });
+
   describe('fetchResourceReleaseBindings', () => {
     function rrb(projectName: string, environment: string) {
       return {

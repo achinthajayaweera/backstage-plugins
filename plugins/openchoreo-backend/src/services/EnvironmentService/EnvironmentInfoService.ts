@@ -1451,6 +1451,60 @@ export class EnvironmentInfoService implements EnvironmentService {
   }
 
   /**
+   * Lists one page of release bindings in a namespace, across all components.
+   *
+   * @param {string} request.namespaceName - Namespace to list from
+   * @param {number} request.limit - Page size, 1 to 100 (server default if omitted)
+   * @param {string} request.cursor - `pagination.nextCursor` from a previous page
+   */
+  async fetchNamespaceReleaseBindings(
+    request: { namespaceName: string; limit?: number; cursor?: string },
+    token?: string,
+  ) {
+    const startTime = Date.now();
+    this.logger.debug(
+      `Fetching release bindings for namespace ${request.namespaceName}`,
+    );
+
+    try {
+      const client = createOpenChoreoApiClient({
+        baseUrl: this.baseUrl,
+        token,
+        logger: this.logger,
+      });
+
+      const { data, error, response } = await client.GET(
+        '/api/v1/namespaces/{namespaceName}/releasebindings',
+        {
+          params: {
+            path: { namespaceName: request.namespaceName },
+            query: { limit: request.limit, cursor: request.cursor },
+          },
+        },
+      );
+
+      assertApiResponse({ data, error, response }, 'fetch release bindings');
+
+      this.logger.debug(
+        `Release bindings fetched for namespace ${request.namespaceName} (${
+          Date.now() - startTime
+        }ms)`,
+      );
+
+      return data;
+    } catch (error: unknown) {
+      this.logger.error(
+        `Failed to fetch release bindings for namespace ${
+          request.namespaceName
+        }: ${error instanceof Error ? error.message : String(error)} (${
+          Date.now() - startTime
+        }ms)`,
+      );
+      throw error;
+    }
+  }
+
+  /**
    * Fetches ResourceReleaseBindings for a given Resource (by name) within a
    * project. The openchoreo-api endpoint filters by resource name; project
    * scoping is applied here so bindings owned by other projects that happen

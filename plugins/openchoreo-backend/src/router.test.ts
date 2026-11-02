@@ -27,6 +27,7 @@ function createMockServices() {
       fetchComponentReleaseSchema: jest.fn(),
       fetchComponentRelease: jest.fn(),
       fetchReleaseBindings: jest.fn(),
+      fetchNamespaceReleaseBindings: jest.fn(),
       applyReleaseBinding: jest.fn(),
       fetchResourceReleaseBindings: jest.fn(),
       fetchResourceEnvironmentInfo: jest.fn(),
@@ -1010,6 +1011,86 @@ describe('createRouter', () => {
         }),
       });
     });
+  });
+
+  describe('GET /namespace-release-bindings', () => {
+    const binding = {
+      metadata: {
+        name: 'cart-dev',
+        namespace: 'my-namespace',
+        creationTimestamp: '2025-01-06T11:00:00Z',
+      },
+      spec: {
+        owner: { projectName: 'shop', componentName: 'cart' },
+        environment: 'dev',
+        releaseName: 'v1',
+      },
+      status: {
+        conditions: [{ type: 'Ready', status: 'True', reason: 'Ready' }],
+      },
+    };
+
+    it('returns transformed items and the next cursor', async () => {
+      services.environmentInfoService.fetchNamespaceReleaseBindings.mockResolvedValue(
+        { items: [binding], pagination: { nextCursor: 'abc' } },
+      );
+
+      const response = await request(app)
+        .get('/namespace-release-bindings')
+        .query({ namespaceName: 'my-namespace', limit: '50', cursor: 'prev' });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toMatchObject({
+        success: true,
+        data: {
+          items: [
+            expect.objectContaining({
+              name: 'cart-dev',
+              componentName: 'cart',
+              projectName: 'shop',
+              environment: 'dev',
+              releaseName: 'v1',
+              status: 'Ready',
+            }),
+          ],
+          nextCursor: 'abc',
+        },
+      });
+      expect(
+        services.environmentInfoService.fetchNamespaceReleaseBindings,
+      ).toHaveBeenCalledWith(
+        { namespaceName: 'my-namespace', limit: 50, cursor: 'prev' },
+        'mock-user-token',
+      );
+    });
+
+    it('has no next cursor on the last page', async () => {
+      services.environmentInfoService.fetchNamespaceReleaseBindings.mockResolvedValue(
+        { items: [binding] },
+      );
+
+      const response = await request(app)
+        .get('/namespace-release-bindings')
+        .query({ namespaceName: 'my-namespace' });
+
+      expect(response.status).toBe(200);
+      expect(response.body.data.nextCursor).toBeUndefined();
+    });
+
+    it('returns 400 when namespaceName is missing', async () => {
+      const response = await request(app).get('/namespace-release-bindings');
+      expect(response.status).toBe(400);
+    });
+
+    it.each(['0', '101', '1.5', 'abc'])(
+      'returns 400 for the invalid limit %s',
+      async limit => {
+        const response = await request(app)
+          .get('/namespace-release-bindings')
+          .query({ namespaceName: 'my-namespace', limit });
+        expect(response.status).toBe(400);
+      },
+    );
   });
 
   describe('GET /resource-release-bindings', () => {
