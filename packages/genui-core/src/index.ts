@@ -6,3 +6,4 @@ export * from './validate';
 export * from './pipeline';
 export * from './deployments';
 export * from './viewModel';
+export * from './loadWidget';
