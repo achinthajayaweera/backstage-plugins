@@ -10387,6 +10387,8 @@ __metadata:
     "@openchoreo/backstage-plugin-openchoreo-workflows": "workspace:^"
     "@openchoreo/backstage-plugin-platform-engineer-core": "workspace:^"
     "@openchoreo/backstage-plugin-react": "workspace:^"
+    "@openchoreo/genui-core": "workspace:^"
+    "@openchoreo/genui-react": "workspace:^"
     "@rjsf/core": "npm:5.24.13"
     "@rjsf/material-ui": "npm:5.24.13"
     "@rjsf/utils": "npm:5.24.13"
@@ -10501,7 +10503,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@openchoreo/genui-react@workspace:packages/genui-react":
+"@openchoreo/genui-react@workspace:^, @openchoreo/genui-react@workspace:packages/genui-react":
   version: 0.0.0-use.local
   resolution: "@openchoreo/genui-react@workspace:packages/genui-react"
   dependencies:

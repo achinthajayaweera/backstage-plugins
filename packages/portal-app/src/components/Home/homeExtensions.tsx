@@ -74,6 +74,40 @@ const recentDeploymentsWidget = HomePageWidgetBlueprint.make({
   },
 });
 
+const generatedWidget = HomePageWidgetBlueprint.make({
+  name: 'oc-generated-widget',
+  params: {
+    name: 'OpenChoreoGeneratedWidget',
+    title: 'Generated widget (preview)',
+    description:
+      'A chart or number drawn from a ready-made widget spec, using sample data. Pick which one with the settings icon.',
+    layout: defaultWidgetLayout,
+    settings: {
+      schema: {
+        title: 'Generated widget',
+        type: 'object',
+        properties: {
+          preset: {
+            type: 'string',
+            title: 'Widget',
+            default: 'byEnvironment',
+            oneOf: [
+              { const: 'byEnvironment', title: 'Deployments per environment' },
+              { const: 'activeCount', title: 'Active deployments' },
+              { const: 'perDay', title: 'Deployments per day' },
+              { const: 'byStatus', title: 'Deployments by status' },
+            ],
+          },
+        },
+      },
+    },
+    components: async () => {
+      const { GeneratedWidgetContent } = await import('./GeneratedWidget');
+      return { Content: GeneratedWidgetContent };
+    },
+  },
+});
+
 const homeLayout = HomePageLayoutBlueprint.make({
   params: {
     loader: async () => {
@@ -92,6 +126,7 @@ export const homeModule = createFrontendModule({
     recentlyVisitedWidget,
     myProjectsWidget,
     quickActionsWidget,
+    generatedWidget,
     recentDeploymentsWidget,
   ],
 });

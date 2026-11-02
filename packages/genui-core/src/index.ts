@@ -5,5 +5,7 @@ export * from './transform';
 export * from './validate';
 export * from './pipeline';
 export * from './deployments';
+export * from './deployments.fixtures';
+export { MOCK_NOW } from './mocks';
 export * from './viewModel';
 export * from './loadWidget';
