@@ -1,0 +1,224 @@
+diff --git a/dist/alpha.d.ts b/dist/alpha.d.ts
+index 4e24200c3f8194c804d94c298f3b7da792b0f1df..1a01e2faa76ec34fa499a2a04b4aaa791c86a404 100644
+--- a/dist/alpha.d.ts
++++ b/dist/alpha.d.ts
+@@ -147,3 +147,18 @@ declare const homeTranslationRef: _backstage_frontend_plugin_api.TranslationRef<
+ }>;
+ 
+ export { _default as default, homeTranslationRef };
++
++import { SwappableComponentRef as _SwappableComponentRef } from '@backstage/frontend-plugin-api';
++interface AddWidgetDialogWidget { name: string; title?: string; description?: string; }
++interface AddWidgetDialogProps {
++  open: boolean;
++  onClose: () => void;
++  widgets: AddWidgetDialogWidget[];
++  handleAdd: (widget: AddWidgetDialogWidget, settings?: Record<string, unknown>) => void;
++}
++declare const AddWidgetDialog: {
++  (props: AddWidgetDialogProps): JSX.Element | null;
++  ref: _SwappableComponentRef<AddWidgetDialogProps, AddWidgetDialogProps>;
++};
++export { AddWidgetDialog };
++export type { AddWidgetDialogProps, AddWidgetDialogWidget };
+diff --git a/dist/alpha.esm.js b/dist/alpha.esm.js
+index e16b886ffb2467beb5ac5e2778116eed07e2f100..b732fed664c513feb41d06e0c72093280d604d05 100644
+--- a/dist/alpha.esm.js
++++ b/dist/alpha.esm.js
+@@ -154,3 +154,5 @@ const homeTranslationRef = homeTranslationRef$1;
+ 
+ export { alpha as default, homeTranslationRef };
+ //# sourceMappingURL=alpha.esm.js.map
++
++export { AddWidgetDialog } from './components/CustomHomepage/AddWidgetDialog.esm.js';
+diff --git a/dist/components/CustomHomepage/AddWidgetDialog.esm.js b/dist/components/CustomHomepage/AddWidgetDialog.esm.js
+index 4e53796a6de731f3d62b19b9e034f04d2566bd30..cf840c68cfe4d4744c3e2a688b09ca6ee79e5282 100644
+--- a/dist/components/CustomHomepage/AddWidgetDialog.esm.js
++++ b/dist/components/CustomHomepage/AddWidgetDialog.esm.js
+@@ -1,53 +1,9 @@
+-import { jsxs, Fragment, jsx } from 'react/jsx-runtime';
+-import List from '@material-ui/core/List';
+-import ListItem from '@material-ui/core/ListItem';
+-import DialogContent from '@material-ui/core/DialogContent';
+-import DialogTitle from '@material-ui/core/DialogTitle';
+-import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+-import AddIcon from '@material-ui/icons/Add';
+-import ListItemText from '@material-ui/core/ListItemText';
+-import Typography from '@material-ui/core/Typography';
+-import { useTranslationRef } from '@backstage/frontend-plugin-api';
+-import { homeTranslationRef } from '../../translation.esm.js';
++import { createSwappableComponent } from '@backstage/frontend-plugin-api';
+ 
+-const getTitle = (widget) => {
+-  return widget.title || widget.name;
+-};
+-const AddWidgetDialog = (props) => {
+-  const { widgets, handleAdd } = props;
+-  const { t } = useTranslationRef(homeTranslationRef);
+-  return /* @__PURE__ */ jsxs(Fragment, { children: [
+-    /* @__PURE__ */ jsx(DialogTitle, { children: t("addWidgetDialog.title") }),
+-    /* @__PURE__ */ jsx(DialogContent, { children: /* @__PURE__ */ jsx(List, { dense: true, children: widgets.map((widget) => {
+-      return /* @__PURE__ */ jsxs(
+-        ListItem,
+-        {
+-          button: true,
+-          onClick: () => handleAdd(widget),
+-          children: [
+-            /* @__PURE__ */ jsx(ListItemAvatar, { children: /* @__PURE__ */ jsx(AddIcon, {}) }),
+-            /* @__PURE__ */ jsx(
+-              ListItemText,
+-              {
+-                secondary: widget.description && /* @__PURE__ */ jsx(
+-                  Typography,
+-                  {
+-                    component: "span",
+-                    variant: "caption",
+-                    color: "textPrimary",
+-                    children: widget.description
+-                  }
+-                ),
+-                primary: /* @__PURE__ */ jsx(Typography, { variant: "body1", color: "textPrimary", children: getTitle(widget) })
+-              }
+-            )
+-          ]
+-        },
+-        widget.name
+-      );
+-    }) }) })
+-  ] });
+-};
++const AddWidgetDialog = createSwappableComponent({
++  id: "home.add-widget-dialog",
++  loader: () => import('./DefaultAddWidgetDialog.esm.js').then((m) => m.DefaultAddWidgetDialog)
++});
+ 
+ export { AddWidgetDialog };
+ //# sourceMappingURL=AddWidgetDialog.esm.js.map
+diff --git a/dist/components/CustomHomepage/CustomHomepageGrid.esm.js b/dist/components/CustomHomepage/CustomHomepageGrid.esm.js
+index d7bf73936321c3c8f973b20fc7198a987966f8b1..296f8be94d107de7084c5f2f15f9d120c972e311 100644
+--- a/dist/components/CustomHomepage/CustomHomepageGrid.esm.js
++++ b/dist/components/CustomHomepage/CustomHomepageGrid.esm.js
+@@ -1,10 +1,9 @@
+ import { jsx, jsxs, Fragment } from 'react/jsx-runtime';
+-import { useMemo, useState, useEffect, isValidElement, useCallback } from 'react';
++import { useMemo, useState, useEffect, Suspense, isValidElement, useCallback } from 'react';
+ import { WidthProvider, Responsive } from 'react-grid-layout';
+ import { useElementFilter, getComponentData, useApi, storageApiRef } from '@backstage/core-plugin-api';
+ import 'react-grid-layout/css/styles.css';
+ import 'react-resizable/css/styles.css';
+-import Dialog from '@material-ui/core/Dialog';
+ import { makeStyles, createStyles, useTheme } from '@material-ui/core/styles';
+ import { compact } from 'lodash';
+ import useObservable from 'react-use/esm/useObservable';
+@@ -166,7 +165,7 @@ const CustomHomepageGrid = (props) => {
+     return key.split("__")[0];
+   };
+   const { t } = useTranslationRef(homeTranslationRef);
+-  const handleAdd = (widget) => {
++  const handleAdd = (widget, initialSettings = {}) => {
+     const widgetId = `${widget.name}__${widgets.length + 1}${Math.random().toString(36).slice(2)}`;
+     setWidgets([
+       ...widgets,
+@@ -185,7 +184,7 @@ const CustomHomepageGrid = (props) => {
+           isResizable: editMode,
+           isDraggable: editMode
+         },
+-        settings: {},
++        settings: initialSettings,
+         movable: widget.movable,
+         deletable: widget.deletable,
+         resizable: widget.resizable
+@@ -193,6 +192,12 @@ const CustomHomepageGrid = (props) => {
+     ]);
+     setAddWidgetDialogOpen(false);
+   };
++  const handleAddFromDialog = ({ name }, settings) => {
++    const widget = availableWidgets.find((w) => w.name === name);
++    if (widget) {
++      handleAdd(widget, settings);
++    }
++  };
+   const handleRemove = (widgetId) => {
+     setWidgets(widgets.filter((w) => w.id !== widgetId));
+   };
+@@ -273,14 +278,7 @@ const CustomHomepageGrid = (props) => {
+         cancel: handleCancel
+       }
+     ) }),
+-    /* @__PURE__ */ jsx(
+-      Dialog,
+-      {
+-        open: addWidgetDialogOpen,
+-        onClose: () => setAddWidgetDialogOpen(false),
+-        children: /* @__PURE__ */ jsx(AddWidgetDialog, { widgets: availableWidgets, handleAdd })
+-      }
+-    ),
++    /* @__PURE__ */ jsx(Suspense, { fallback: null, children: /* @__PURE__ */ jsx(AddWidgetDialog, { open: addWidgetDialogOpen, onClose: () => setAddWidgetDialogOpen(false), widgets: availableWidgets, handleAdd: handleAddFromDialog }) }),
+     !editMode && widgets.length === 0 && /* @__PURE__ */ jsx(Typography, { variant: "h5", align: "center", children: t("customHomepage.noWidgets") }),
+     /* @__PURE__ */ jsx(
+       ResponsiveGrid,
+diff --git a/dist/components/CustomHomepage/DefaultAddWidgetDialog.esm.js b/dist/components/CustomHomepage/DefaultAddWidgetDialog.esm.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..291bd5be3b4ebb7a71f8952b735eb44e44b8b67c
+--- /dev/null
++++ b/dist/components/CustomHomepage/DefaultAddWidgetDialog.esm.js
+@@ -0,0 +1,59 @@
++import { jsx, jsxs, Fragment } from 'react/jsx-runtime';
++import Box from '@material-ui/core/Box';
++import Dialog from '@material-ui/core/Dialog';
++import List from '@material-ui/core/List';
++import ListItem from '@material-ui/core/ListItem';
++import DialogContent from '@material-ui/core/DialogContent';
++import DialogTitle from '@material-ui/core/DialogTitle';
++import ListItemAvatar from '@material-ui/core/ListItemAvatar';
++import AddIcon from '@material-ui/icons/Add';
++import ListItemText from '@material-ui/core/ListItemText';
++import Typography from '@material-ui/core/Typography';
++import { useTranslationRef } from '@backstage/frontend-plugin-api';
++import { homeTranslationRef } from '../../translation.esm.js';
++
++const getTitle = (widget) => {
++  return widget.title || widget.name;
++};
++const AddWidgetDialogContent = (props) => {
++  const { widgets, handleAdd } = props;
++  const { t } = useTranslationRef(homeTranslationRef);
++  return /* @__PURE__ */ jsxs(Fragment, { children: [
++    /* @__PURE__ */ jsx(DialogTitle, { children: t("addWidgetDialog.title") }),
++    /* @__PURE__ */ jsx(DialogContent, { children: widgets.length === 0 ? /* @__PURE__ */ jsx(Box, { pb: 3, textAlign: "center", children: /* @__PURE__ */ jsx(Typography, { variant: "body1", color: "textSecondary", children: t("addWidgetDialog.noAvailableWidgets") }) }) : /* @__PURE__ */ jsx(List, { dense: true, children: widgets.map((widget) => {
++      return /* @__PURE__ */ jsxs(
++        ListItem,
++        {
++          button: true,
++          onClick: () => handleAdd(widget),
++          children: [
++            /* @__PURE__ */ jsx(ListItemAvatar, { children: /* @__PURE__ */ jsx(AddIcon, {}) }),
++            /* @__PURE__ */ jsx(
++              ListItemText,
++              {
++                secondary: widget.description && /* @__PURE__ */ jsx(
++                  Typography,
++                  {
++                    component: "span",
++                    variant: "caption",
++                    color: "textPrimary",
++                    children: widget.description
++                  }
++                ),
++                primary: /* @__PURE__ */ jsx(Typography, { variant: "body1", color: "textPrimary", children: getTitle(widget) })
++              }
++            )
++          ]
++        },
++        widget.name
++      );
++    }) }) })
++  ] });
++};
++const DefaultAddWidgetDialog = (props) => {
++  const { open, onClose, widgets, handleAdd } = props;
++  return /* @__PURE__ */ jsx(Dialog, { open, onClose, children: open && /* @__PURE__ */ jsx(AddWidgetDialogContent, { widgets, handleAdd }) });
++};
++
++export { DefaultAddWidgetDialog };
++//# sourceMappingURL=DefaultAddWidgetDialog.esm.js.map
