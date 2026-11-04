@@ -91,8 +91,11 @@ describe('customOverrides', () => {
     // now ships from the assistant plugin's own alpha module so the shell
     // carries no dependency on the private plugin — see
     // plugins/openchoreo-portal-assistant/src/alpha.tsx.
-    expect(extensions).toHaveLength(4);
+    expect(extensions).toHaveLength(5);
     expect(extensions.map(e => e.id)).toContain('component:app/progress');
     expect(extensions.map(e => e.id)).toContain('component:app/page-layout');
+    expect(extensions.map(e => e.id)).toContain(
+      'component:app/add-widget-dialog',
+    );
   });
 });

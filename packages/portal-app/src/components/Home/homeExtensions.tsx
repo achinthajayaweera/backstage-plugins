@@ -87,6 +87,7 @@ const generatedWidget = HomePageWidgetBlueprint.make({
         title: 'Generated widget',
         type: 'object',
         properties: {
+          title: { type: 'string', title: 'Title' },
           preset: {
             type: 'string',
             title: 'Widget',

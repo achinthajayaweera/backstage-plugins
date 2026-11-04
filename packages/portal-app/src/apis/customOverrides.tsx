@@ -30,6 +30,7 @@ import {
 } from '@backstage/plugin-app-react';
 import { PageLayout, Progress } from '@backstage/frontend-plugin-api';
 import { PageLoader } from '@openchoreo/backstage-design-system';
+import { AddWidgetDialog } from '@backstage/plugin-home/alpha';
 import { OpenChoreoPageLayout } from '../components/PageLayout/OpenChoreoPageLayout';
 import { catalogImportTranslationRef } from '@backstage/plugin-catalog-import/alpha';
 import {
@@ -388,6 +389,17 @@ export const customAppModule = createFrontendModule({
         defineParams({
           component: PageLayout,
           loader: () => OpenChoreoPageLayout,
+        }),
+    }),
+    // Swap the home page "Add widget" dialog for one with a prompt bar.
+    SwappableComponentBlueprint.make({
+      name: 'add-widget-dialog',
+      params: defineParams =>
+        defineParams({
+          component: AddWidgetDialog,
+          loader: async () =>
+            (await import('../components/Home/PromptAddWidgetDialog'))
+              .PromptAddWidgetDialog,
         }),
     }),
   ],
